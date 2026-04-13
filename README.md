@@ -9,7 +9,7 @@ Sistema de carga de comprobantes de transferencias bancarias de bancos de Argent
 
 ## Flujo
 
-```
+```bash
 [Imagen] → [API OCR] → [Texto] → [API LLM] → [Datos curados] → [Formulario]
 ```
 
@@ -24,7 +24,7 @@ Sistema de carga de comprobantes de transferencias bancarias de bancos de Argent
 ### Backend
 
 ```bash
-cd apps/backend
+cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -e .
@@ -33,13 +33,13 @@ pip install -e .
 # OCR_API_URL=http://tu-api-ocr
 # LLM_API_URL=http://tu-api-llm
 
-uvicorn apps.backend.main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8000
 ```
 
 ### Frontend
 
 ```bash
-cd apps/frontend
+cd frontend
 npm install
 npm run dev
 ```
