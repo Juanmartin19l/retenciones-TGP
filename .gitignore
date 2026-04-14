@@ -38,3 +38,4 @@ npm-debug.log*
 .pytest_cache/
 .coverage
 htmlcov/
+testing-ocr/
