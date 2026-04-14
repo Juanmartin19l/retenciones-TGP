@@ -1,0 +1,55 @@
+/**
+ * Cuentas válidas para transferencia SGP.
+ * CBU de 22 dígitos → nombre de la cuenta.
+ */
+
+export interface CuentaSGP {
+  cbu: string;
+  nombre: string;
+}
+
+export const CUENTAS_SGP: CuentaSGP[] = [
+  { cbu: '360000200970918', nombre: 'SGP Z/05 - RENTAS GENERALES' },
+  { cbu: '360000200971904', nombre: 'SGP FDO. TERCEROS AG. RET. IMP. A LAS GANANCIAS' },
+  { cbu: '360000200980940', nombre: 'S.G.P. SIJP - RETENCION Y PERCEPCION' },
+  { cbu: '360000200851394', nombre: 'SGP FDOS. DE TERCEROS' },
+  { cbu: '360000200980537', nombre: 'SGP FDO NACIONAL INCENTIVO DOCENTE' },
+  { cbu: '360000200980957', nombre: 'SGP PLAN NACIONAL DE SEGURIDAD ALIMENTARIA LEY 25.724' },
+  { cbu: '360000002253785', nombre: 'S.G.P. PLAN NACIONAL DE SEGURIDAD ALIMENTARIA - CONTRAPARTE PROVINCIA' },
+  { cbu: '360000200971317', nombre: 'SGP GASTOS LEY 17671' },
+  { cbu: '360000200984287', nombre: 'S.G.P. PLAN FINES' },
+  { cbu: '360000000680802', nombre: 'S.G.P. LEY N 8365 - PROC. P/DEFENSA DE LOS DERECHOS Y GARANTIAS' },
+  { cbu: '360000001440087', nombre: 'S.G.P. UNIDAD PARA EL DESARROLLO PRODUCTIVO - MDP' },
+  { cbu: '360000200980520', nombre: 'SGP U.E.P. PENS. NO CONTRIBUTIVAS' },
+  { cbu: '360000200971843', nombre: 'SGP SECRETARIA DE ESTADO DE TRABAJO MULTAS' },
+  { cbu: '360000003873122', nombre: 'SGP-RENTAS GRALES-PAGADORA' },
+  { cbu: '360000200971577', nombre: 'SGP PROGRAMAS ESTADISTICAS NACIONALES' },
+  { cbu: '360000200984690', nombre: 'SGP RET. IVA MONOTRIBUTO RG 2616/09' },
+  { cbu: '360000200982519', nombre: 'SGP PENSIONES NO CONTRIBUTIVAS-FONDOS PROVINCIALES' },
+  { cbu: '360000003663202', nombre: 'SGP-LEY NAC.OVINA FRAO-UEP TUC' },
+  { cbu: '360000200971232', nombre: 'S.G.P FONDO FORESTAL' },
+  { cbu: '360000200971249', nombre: 'S.G.P FOMENTO A LA PSICULTURA' },
+  { cbu: '360000200971256', nombre: 'S.G.P PROTECCION A LA FAUNA SILVESTRE' },
+  { cbu: '360000200984256', nombre: 'S.G.P COPROSA Nº7.437' },
+  { cbu: '360000200979342', nombre: 'S.G.P SANIDAD VEGETAL' },
+  { cbu: '360000002253815', nombre: 'SGP-PROG.OBS.MUJER.CONTR.PCI' },
+  { cbu: '360000200971201', nombre: 'SGP DESTACAMENTOS POLICIALES' },
+  { cbu: '360000002789217', nombre: 'S.G.P. F.I.E. - LEY N 8867 - M.D.P.' },
+  { cbu: '360000001192988', nombre: 'S.G.P. FONDO DE LAS NACIONES UNIDAS PARA LA INFANCIA - UNICEF' },
+  { cbu: '360000200980513', nombre: 'S.G.P. FOMENTO Y DESARROLLO MINERO' },
+  { cbu: '360000003792957', nombre: 'S.G.P. DIRECCION GRAL. DE POLICIA ADICIONAL' },
+  { cbu: '360000200978813', nombre: 'S.G.P. POL. SOC. COMUNIT.' },
+  { cbu: '000094207389131', nombre: 'S.G.P. JORNADA EXTENDIDA - FONDOS NACIONALES' },
+  { cbu: '000094244494801', nombre: 'SGP CANON CONTRATO DE LEASING DCTO. 353 8 MOYSP 2025' },
+  { cbu: '362809420897841', nombre: 'S.G.P. - SOBRANTE DE HABERES JORNADA EXTENDIDA' },
+  { cbu: '362809420738913', nombre: 'S.G.P. JORNADA EXTENDIDA - FONDOS NACIONALES' },
+  { cbu: '360000200971546', nombre: 'SGP POLITICAS SOCIALES COMUNITARIAS' },
+];
+
+/**
+ * Busca una cuenta SGP por CBU.
+ * Devuelve la cuenta si existe, o null si no es un CBU válido.
+ */
+export function buscarCuentaSGP(cbu: string): CuentaSGP | null {
+  return CUENTAS_SGP.find(cuenta => cuenta.cbu === cbu) || null;
+}
