@@ -1,40 +1,39 @@
-# Retenciones
+# Retenciones TGP
 
 Sistema de carga de comprobantes de transferencias bancarias de bancos de Argentina.
 
 ## Stack
 
-- **Frontend**: React + Vite + TypeScript
-- **Backend**: FastAPI (Python 3.11+)
+- **Frontend**: React + Vite + TypeScript + Tailwind CSS v4
 
 ## Flujo
 
-```bash
-[Imagen] → [API OCR] → [Texto] → [API LLM] → [Datos curados] → [Formulario]
+```
+[Imagen] → [API OCR] → [Texto] → [Regex] → [Datos extraídos] → [Formulario] → [Usuario completa] → [Guardar]
 ```
 
-1. Usuario sube imagen del comprobante
-2. Backend envía a API de OCR
-3. Texto extraído se envía a API de LLM para curado
-4. Frontend recibe datos curados y pre-popula campos editables
-5. Usuario puede corregir y guardar
+1. Usuario sube imagen del comprobante (PDF o imagen)
+2. Frontend envía a API de OCR (interna)
+3. Texto extraído se procesa con expresiones regulares
+4. Frontend recibe datos extraídos y pre-popula campos editables
+5. Usuario completa datos faltantes (CUIT destino, Tipo, Nº OP SAFyC)
+6. Usuario puede corregir y guardar
+
+## Campos del Formulario
+
+### Extraídos del OCR (automático)
+- **Fecha de transferencia**
+- **Importe transferido**
+- **Banco origen**
+- **Nº de referencia / Comprobante**
+- **CBU destino** (guardado internamente, no se muestra)
+
+### Ingresados por el usuario
+- **CUIT / CUIL del destino** — Se validará con API externa
+- **Tipo** — Selector: Gasto, Sueldo, Otro
+- **Nº OP SAFyC** — Número de operación SAFyC
 
 ## Setup
-
-### Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -e .
-
-# Variables de entorno (crear .env)
-# OCR_API_URL=http://tu-api-ocr
-# LLM_API_URL=http://tu-api-llm
-
-uvicorn backend.main:app --reload --port 8000
-```
 
 ### Frontend
 
@@ -44,16 +43,24 @@ npm install
 npm run dev
 ```
 
-## APIs Internas
+### Variables de Entorno
 
-El sistema consume APIs de la red interna:
+Crear un archivo `.env` en `frontend/` basado en `.env.example`:
 
-- **OCR**: Extracción de texto de imagen
-- **LLM**: Curado y estructuración de datos OCR
+```bash
+VITE_OCR_API_URL=<URL de la API OCR>
+```
 
-## Variables de Entorno (Backend)
+## API OCR
 
-| Variable | Descripción |
-|----------|-------------|
-| `OCR_API_URL` | URL de la API de OCR |
-| `LLM_API_URL` | URL de la API de LLM |
+El sistema consume una API OCR de la red interna:
+
+- **Endpoint**: `POST /api/v1/ocr/upload`
+- **Formato**: `multipart/form-data` con campo `files`
+- **Extensiones soportadas**: png, jpg, jpeg, bmp, gif, pdf
+
+## Pendiente
+
+- [ ] API para validar CUIT/CUIL del destino
+- [ ] Listado de CBUs válidos para verificar cuenta destino
+- [ ] Backend FastAPI para persistencia
