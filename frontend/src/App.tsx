@@ -300,21 +300,28 @@ export default function App() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700">Fecha de Transferencia</label>
+                  <label className="text-sm font-medium text-gray-700">Fecha Comprobante</label>
                   <input 
-                    type="text" 
-                    value={data.fecha}
-                    onChange={(e) => setData({...data, fecha: e.target.value})}
+                    type="date" 
+                    value={data.fecha ? data.fecha.split('/').reverse().join('-') : ''}
+                    onChange={(e) => {
+                      const val = e.target.value; // YYYY-MM-DD
+                      if (val) {
+                        const [year, month, day] = val.split('-');
+                        setData({...data, fecha: `${day}/${month}/${year}`});
+                      } else {
+                        setData({...data, fecha: ''});
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                    placeholder="DD/MM/AAAA"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700">Importe Transferido ($)</label>
+                  <label className="text-sm font-medium text-gray-700">Importe</label>
                   <input 
                     type="text" 
                     value={data.monto}
-                    onChange={(e) => setData({...data, monto: e.target.value})}
+                    onChange={(e) => setData({...data, monto: e.target.value.replace(/[^0-9.,]/g, '')})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                     placeholder="150.450,00"
                   />
@@ -333,10 +340,12 @@ export default function App() {
                   <label className="text-sm font-medium text-gray-700">Nº de Referencia / Comprobante</label>
                   <input 
                     type="text" 
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={data.nroComprobante}
-                    onChange={(e) => setData({...data, nroComprobante: e.target.value})}
+                    onChange={(e) => setData({...data, nroComprobante: e.target.value.replace(/\D/g, '')})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                    placeholder="Ej: TRF-12345678"
+                    placeholder="Ej: 12345678"
                   />
                 </div>
               </div>
