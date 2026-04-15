@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   UploadCloud, 
   FileText, 
@@ -13,6 +13,7 @@ import { uploadToOcr } from './services/ocr';
 import type { OcrUploadResult } from './services/ocr';
 import { parseReceiptText } from './utils/receiptParser';
 import { buscarCuentaSGP, CUENTAS_SGP, type CuentaSGP } from './utils/cuentasSGP';
+import { consultarCuit, type CuitData } from './services/cuit';
 
 type AppState = 'idle' | 'uploading' | 'processing_ocr' | 'ready' | 'error';
 type ComprobanteTipo = 'Gasto' | 'Sueldo' | 'Otro';
@@ -39,15 +40,47 @@ export default function App() {
   const [cuitDestino, setCuitDestino] = useState('');
   const [tipo, setTipo] = useState<ComprobanteTipo>('Gasto');
   const [numOpSafyc, setNumOpSafyc] = useState('');
+  
   // Cuenta destino SGP seleccionada por el usuario
   const [cuentaDestinoSGP, setCuentaDestinoSGP] = useState<CuentaSGP | null>(null);
   
+  const [cuitData, setCuitData] = useState<CuitData | null>(null);
+  const [isConsultandoCuit, setIsConsultandoCuit] = useState(false);
+  const [errorCuit, setErrorCuit] = useState<string | null>(null);
+
   const [rawOcrText, setRawOcrText] = useState<string>('');
   const [ocrConfidence, setOcrConfidence] = useState<number>(0);
   const [parseErrors, setParseErrors] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Efecto para buscar CUIT cuando se ingresan 11 digitos
+  useEffect(() => {
+    const checkCuit = async () => {
+      const numero = cuitDestino.replace(/\D/g, '');
+      if (numero.length === 11) {
+        setIsConsultandoCuit(true);
+        setErrorCuit(null);
+        const result = await consultarCuit(numero);
+        setIsConsultandoCuit(false);
+        if (result.success && result.data) {
+          setCuitData(result.data);
+        } else {
+          setCuitData(null);
+          // no pasa nada si falla o no existe, solo avisamos sutilmente (no bloquea guardado)
+          setErrorCuit(result.error || 'No encontrado');
+        }
+      } else {
+        setCuitData(null);
+        setErrorCuit(null);
+      }
+    };
+    
+    // Debounce de 600ms para no disparar peticiones con cada tecla si pegó el texto de a poco
+    const timeoutId = setTimeout(checkCuit, 600);
+    return () => clearTimeout(timeoutId);
+  }, [cuitDestino]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,6 +186,8 @@ export default function App() {
     setParseErrors([]);
     setErrorMessage(null);
     setCuentaDestinoSGP(null);
+    setCuitData(null);
+    setErrorCuit(null);
     
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -166,6 +201,8 @@ export default function App() {
     setParseErrors([]);
     setRawOcrText('');
     setCuentaDestinoSGP(null);
+    setCuitData(null);
+    setErrorCuit(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -390,7 +427,7 @@ export default function App() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">CUIT / CUIL del Destino</label>
+                      <label className="text-sm font-medium text-gray-700">CUIT Proveedor</label>
                       <input 
                         type="text" 
                         value={cuitDestino}
@@ -398,7 +435,21 @@ export default function App() {
                         placeholder="Ej: 30-71123456-8"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow font-mono text-sm"
                       />
-                      <p className="text-xs text-gray-400 mt-1">Se validará con API</p>
+                      {isConsultandoCuit ? (
+                        <p className="text-xs text-blue-500 mt-1 flex items-center gap-1">
+                          <Loader2 className="h-3 w-3 animate-spin"/> Validando CUIT...
+                        </p>
+                      ) : cuitData ? (
+                        <p className="text-xs text-green-700 mt-1 font-medium bg-green-50 border border-green-200 px-2 py-1 rounded inline-block">
+                          {cuitData.denominacion}
+                        </p>
+                      ) : errorCuit ? (
+                        <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
+                           <AlertCircle className="h-3 w-3" /> {errorCuit}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-400 mt-1">Autocompleta nombre al ingresar 11 dígitos</p>
+                      )}
                     </div>
                   </div>
                   
