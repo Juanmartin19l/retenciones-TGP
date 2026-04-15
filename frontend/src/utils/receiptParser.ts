@@ -22,16 +22,16 @@ interface ParseResult {
  * Formatea un monto al formato argentino: 150.450,00
  * Usa punto para miles y coma para decimales.
  */
-function formatAmountToArs(amount: string): string {
+function formatAmount(amount: string): string {
   // amount viene como "150450.00" (formato numérico standard)
   const parts = amount.split('.');
   const intPart = parts[0];
   const decPart = parts.length > 1 ? parts[1] : '00';
 
-  // Agregar puntos de miles al entero
-  const intWithDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  // Agregar comas de miles al entero
+  const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-  return `${intWithDots},${decPart.padEnd(2, '0')}`;
+  return `${intWithCommas}.${decPart.padEnd(2, '0')}`;
 }
 
 /**
@@ -85,31 +85,28 @@ function extractDate(text: string): string | null {
  */
 function extractAmount(text: string): string | null {
   const patterns = [
-    // $150.450,00 o $ 150.450,00 (formato argentino con puntos y coma)
-    /\$\s*([\d.]+)[,.](\d{1,2})/,
-    // 150.450,00 sin símbolo (punto miles, coma decimales)
-    /([\d.]+)[,.](\d{1,2})(?=\s*$|\s*ARS)/m,
+    // $150.450,00 o $1,489.10
+    /\$\s*([\d.,]+)[,.](\d{1,2})/,
+    // 150.450,00 sin símbolo
+    /([\d.,]+)[,.](\d{1,2})(?=\s*$|\s*ARS)/m,
     // Monto con símbolo pesos: "$150450" o "$150450.00"
     /\$\s*([\d]+)[,.]?(\d{0,2})/,
     // Transferencia por $150.450,00
-    /transferencia[s]?\s*(?:por)?\s*\$\s*([\d.]+)[,.](\d{1,2})/i,
+    /transferencia[s]?\s*(?:por)?\s*\$\s*([\d.,]+)[,.](\d{1,2})/i,
   ];
 
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match) {
-      // Normalizar: quitar puntos de miles del grupo 1 (son separadores de miles en formato argentino)
-      // y usar punto decimal internamente
-      let intPart = match[1].replace(/\./g, '');
+      // Normalizar: quitar puntos y comas de la parte entera
+      let intPart = match[1].replace(/[.,]/g, '');
       let decPart = match[2] ? match[2].padEnd(2, '0') : '00';
 
-      // Pero si el patrón tenía coma como separador decimal, el match[2] ya tiene los decimales
-      // y match[1] tiene el entero sin puntos
       const normalizedAmount = `${intPart}.${decPart}`;
 
       if (parseFloat(normalizedAmount) > 0) {
-        // Devolver en formato argentino: 150.450,00
-        return formatAmountToArs(normalizedAmount);
+        // Devolver en el formato esperado: 1,489.10
+        return formatAmount(normalizedAmount);
       }
     }
   }
@@ -156,7 +153,7 @@ function extractBank(text: string): string | null {
     const escapedBank = bank.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const pattern = new RegExp(`\\b${escapedBank}\\b`, 'i');
     if (pattern.test(text)) {
-      return bank;
+      return bank.replace(/^Banco\s+/i, '');
     }
   }
   return null;
