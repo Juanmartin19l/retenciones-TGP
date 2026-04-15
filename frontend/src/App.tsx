@@ -425,10 +425,10 @@ export default function App() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">CUIT Proveedor</label>
-                        <input 
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-700">CUIT Proveedor</label>
+                    <div className="flex items-center gap-3">
+                      <input 
                         type="text" 
                         value={cuitDestino}
                         onChange={(e) => {
@@ -442,23 +442,25 @@ export default function App() {
                           setCuitDestino(val);
                         }}
                         placeholder="Ej: 30-71123456-8"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow font-mono text-sm"
+                        className="w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow font-mono text-sm"
                       />
-                      {isConsultandoCuit ? (
-                        <p className="text-xs text-blue-500 mt-1 flex items-center gap-1">
-                          <Loader2 className="h-3 w-3 animate-spin"/> Validando CUIT...
-                        </p>
-                      ) : cuitData ? (
-                        <p className="text-xs text-green-700 mt-1 font-medium bg-green-50 border border-green-200 px-2 py-1 rounded inline-block">
-                          {cuitData.denominacion}
-                        </p>
-                      ) : errorCuit ? (
-                        <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
-                           <AlertCircle className="h-3 w-3" /> {errorCuit}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-gray-400 mt-1">Autocompleta nombre al ingresar 11 dígitos</p>
-                      )}
+                      <div className="flex-1 truncate">
+                        {isConsultandoCuit ? (
+                          <span className="text-sm text-blue-500 flex items-center gap-1">
+                            <Loader2 className="h-4 w-4 animate-spin"/> Validando...
+                          </span>
+                        ) : cuitData ? (
+                          <span className="text-sm text-green-700 font-medium bg-green-50 border border-green-200 px-3 py-1.5 rounded-md inline-block">
+                            {cuitData.denominacion}
+                          </span>
+                        ) : errorCuit ? (
+                          <span className="text-sm text-red-500 font-medium flex items-center gap-1">
+                             <AlertCircle className="h-4 w-4" /> No encontrado
+                          </span>
+                        ) : (
+                          <span className="text-sm text-gray-400">Completá 11 dígitos</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
