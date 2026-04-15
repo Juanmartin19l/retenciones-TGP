@@ -428,10 +428,19 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
                       <label className="text-sm font-medium text-gray-700">CUIT Proveedor</label>
-                      <input 
+                        <input 
                         type="text" 
                         value={cuitDestino}
-                        onChange={(e) => setCuitDestino(e.target.value)}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, '');
+                          if (val.length > 11) val = val.substring(0, 11);
+                          if (val.length > 2 && val.length <= 10) {
+                            val = val.slice(0, 2) + '-' + val.slice(2);
+                          } else if (val.length > 10) {
+                            val = val.slice(0, 2) + '-' + val.slice(2, 10) + '-' + val.slice(10);
+                          }
+                          setCuitDestino(val);
+                        }}
                         placeholder="Ej: 30-71123456-8"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow font-mono text-sm"
                       />
